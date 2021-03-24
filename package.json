@@ -1,0 +1,23 @@
+{
+  "name": "pokebot",
+  "version": "1.0.0",
+  "description": "botzao",
+  "main": "index.js",
+  "scripts": {
+    "test": "testc",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "n"
+  },
+  "keywords": [
+    "n"
+  ],
+  "author": "n",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "axios": "^0.21.1"
+  },
+  "type": "module"
+}
