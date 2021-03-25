@@ -7,9 +7,9 @@ const client = new Discord.Client();
 
 let intervalRef = null;
 let pbCount = 0;
-// let gbCount = 0;
+let gbCount = 0;
 let ubCount = 0;
-// let mbCount = 0;
+let mbCount = 0;
 // let prbCount = 0;
 let foundCaptcha = false;
 
@@ -86,8 +86,13 @@ const getPokeballType = (text) => {
         ubCount ++;
         return 'ub';
     } else if (text.search('Legendary') !== -1 || text.search('Shiny') !== -1) {
-        ubCount ++;
-        return 'ub';
+        if (mbCount < 3) {
+          mbCount ++;
+          return 'mb'
+        } else {
+          ubCount ++;
+          return 'ub';
+        }
     }
 }
 
