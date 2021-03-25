@@ -111,7 +111,7 @@ const solveCaptcha = (uri) => {
                     }).catch((errGet) => {
                         console.log('ERR GET', errGet);
                     })
-                }, 10000)
+                }, 30000)
             }).catch((errPost) => {
                 console.log('ERR POST', errPost);
             })
@@ -140,11 +140,11 @@ const runReadBot = () => {
                 })
             }
             if (msg.content.search('captcha') !== -1 && !foundCaptcha) {
+                foundCaptcha = true;
+                clearInterval(intervalRef);
                 msg.attachments.map((item) => {
                     solveCaptcha(item.url);
                 })
-                foundCaptcha = true;
-                clearInterval(intervalRef);
                 msg.channel.send("Resolvam indianos!!!");
                 // alert('TEM CAPTCHA LA NO BOT SEU FDP');
                 // stopCaptchaCount();
