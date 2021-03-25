@@ -6,7 +6,7 @@ const headers = {
     'accept-encoding': 'gzip, deflate, br',
     'accept-language': 'pt-BR',
     'content-type': 'application/json',
-    authorization: 'NzQ0OTc2OTQ5MTU1MzMyMTA2.YFtT6A.mdJbH9mQBlhY4wIgHH5Lu5Pa-x4',
+    authorization: 'NDEzMjk3MjMyOTYwNTUyOTYw.YFyN3Q.HH0kruBtBScEF5kcz7gKgDd4fKQ',
     'cookie': '__cfduid=de0e885576a7a30ae7ff46bf34b4d55181616437070; locale=pt-BR',
     'origin': 'https://discord.com',
     'referer': `https://discord.com/channels/689624343138795532/${chatId}`,
@@ -20,6 +20,6 @@ const headers = {
     
 };
 const pokeBotId = '664508672713424926';
-const ourDiscordBotToken = 'ODI0Mzc4MTY0NDY0NTgyNjY2.YFuf_g.8T7YJWu13Vj_BtJfNGU6hUokrvg';
+const ourDiscordBotToken = 'ODI0Mzc4MTY0NDY0NTgyNjY2.YFuf_g.6haanJSgcU8H7hWqJlsKtxPsxgA';
 
 export { apiPost, chatId, pokeBotId, ourDiscordBotToken, typingApi, headers };

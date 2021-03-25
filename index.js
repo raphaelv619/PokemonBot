@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import imageToBase64 from 'image-to-base64';
+import imageToBase64 from 'image-to-base64';
 import Discord from 'discord.js';
 import alert from 'alert';
 import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, typingApi } from './config.js';
@@ -51,13 +51,13 @@ const stopCaptchaCount = () => {
 };
 
 const shouldBuyPokeball = () => {
-    if (pbCount === 20) {
+    if (pbCount >= 10) {
         setTimeout(() => {
-            buyPokeball(1, 20);
+            buyPokeball(1, 10);
             pbCount = 0;
         }, 4000);
     }
-    if (ubCount === 5) {
+    if (ubCount >= 3) {
         setTimeout(() => {
             buyPokeball(3, 3);
             ubCount = 0;
@@ -67,10 +67,10 @@ const shouldBuyPokeball = () => {
 
 const buyPokeball = (pokeballId, quantity) => {
     return new Promise((resolve, _reject) => {
-        tellDiscYreTyping(() => {
-            axios.post(apiPost, { content: `;shop buy ${pokeballId} ${quantity}` }, { headers }).then(res => {
-                resolve(res);
-            })
+        axios.post(apiPost, { content: `;shop buy ${pokeballId} ${quantity}` }, { headers }).then(res => {
+            resolve(res);
+        }).catch((err) => {
+            console.log('ERR?', err);
         })
     });
 };
@@ -91,6 +91,39 @@ const getPokeballType = (text) => {
     }
 }
 
+const sendCaptchaRes = (solvedCaptcha) => {
+    return new Promise((resolve, _reject) => {
+        axios.post(apiPost, { content: solvedCaptcha }, { headers }).then(res => {
+            shouldBuyPokeball();
+            resolve(res);
+        });
+    });
+}
+
+const solveCaptcha = (uri) => {
+    imageToBase64(uri) // Image URL
+    .then(
+        (response) => {
+            axios.post('http://2captcha.com/in.php', { body: response, method: 'base64', key: '8bce43db75193c38a012feb8835510bd', json: 1 }).then((resPost) => {
+                setTimeout(() => {
+                    axios.get(`http://2captcha.com/res.php?key=8bce43db75193c38a012feb8835510bd&action=get&json=1&id=${resPost.data.request}`).then((resGet) => {
+                        sendCaptchaRes(resGet.data.request);
+                    }).catch((errGet) => {
+                        console.log('ERR GET', errGet);
+                    })
+                }, 10000)
+            }).catch((errPost) => {
+                console.log('ERR POST', errPost);
+            })
+        }
+    )
+    .catch(
+        (error) => {
+            console.log(error); // Logs an error if there was one
+        }
+    )
+}
+
 const runWriteBot = () => {
     intervalRef = setInterval(() => {
         findPokemon();
@@ -100,16 +133,32 @@ const runWriteBot = () => {
 const runReadBot = () => {
     client.on('message', msg => {
         if (msg.channel.id === chatId && msg.author.id === pokeBotId) {
+            if (msg.content.search('captcha') !== -1 && foundCaptcha) {
+                msg.attachments.map((item) => {
+                    solveCaptcha(item.url);
+                    msg.channel.send("Errou indiano maldito, tente dnv");
+                })
+            }
             if (msg.content.search('captcha') !== -1 && !foundCaptcha) {
+                msg.attachments.map((item) => {
+                    solveCaptcha(item.url);
+                })
                 foundCaptcha = true;
                 clearInterval(intervalRef);
-                msg.channel.send("Olha só, temos um captcha aki, tchaom.");
-                alert('TEM CAPTCHA LA NO BOT SEU FDP');
-                stopCaptchaCount();
+                msg.channel.send("Resolvam indianos!!!");
+                // alert('TEM CAPTCHA LA NO BOT SEU FDP');
+                // stopCaptchaCount();
             }
             if (msg.content.search('catch') !== -1 && !foundCaptcha) {
                 const pokeballType = getPokeballType(msg.embeds[0].footer.text);
                 throwPokeball(pokeballType);
+                // setTimeout(() => {
+                // }, 500);
+            }
+            if (msg.content.search('continue hunting!') !== -1 && foundCaptcha) {
+                foundCaptcha = false;
+                msg.channel.send("Boaaaaa indiano");
+                runWriteBot();
             }
         }
     });
