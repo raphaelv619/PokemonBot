@@ -119,6 +119,7 @@ const sendCaptchaRes = (solvedCaptcha) => {
 }
 
 const solveCaptcha = (uri) => {
+    alert('Resolve captcha!');
     imageToBase64(uri) // Image URL
     .then(
         (response) => {
