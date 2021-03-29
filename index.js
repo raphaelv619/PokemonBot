@@ -53,10 +53,16 @@ const stopCaptchaCount = () => {
 };
 
 const shouldBuyPokeball = () => {
-    if (pbCount >= 20) {
+    if (pbCount >= 150) {
         setTimeout(() => {
-            buyPokeball(1, 20);
+            buyPokeball(1, 10);
             pbCount = 0;
+        }, 4000);
+    }
+    if (gbCount >= 10) {
+        setTimeout(() => {
+            buyPokeball(2, 10);
+            gbCount = 0;
         }, 4000);
     }
     if (ubCount >= 3) {
@@ -82,8 +88,8 @@ const getPokeballType = (text) => {
         pbCount ++;
         return 'pb';
     } else if (text.search('Rare') !== -1 && text.search('Super') === -1) {
-        pbCount ++;
-        return 'pb';
+        gbCount ++;
+        return 'gb';
     } else if (text.search('Super Rare') !== -1) {
         ubCount ++;
         return 'ub';
