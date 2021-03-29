@@ -21,5 +21,6 @@ const headers = {
 };
 const pokeBotId = '664508672713424926';
 const ourDiscordBotToken = 'ODI0Mzc4MTY0NDY0NTgyNjY2.YFuf_g.6haanJSgcU8H7hWqJlsKtxPsxgA';
+const twoCaptchaKey = '8bce43db75193c38a012feb8835510bd';
 
-export { apiPost, chatId, pokeBotId, ourDiscordBotToken, typingApi, headers };
+export { apiPost, chatId, pokeBotId, ourDiscordBotToken, typingApi, twoCaptchaKey, headers };

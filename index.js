@@ -2,7 +2,7 @@ import axios from 'axios';
 import imageToBase64 from 'image-to-base64';
 import Discord from 'discord.js';
 import alert from 'alert';
-import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, typingApi } from './config.js';
+import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, twoCaptchaKey, typingApi } from './config.js';
 const client = new Discord.Client();
 
 let intervalRef = null;
@@ -12,6 +12,8 @@ let ubCount = 0;
 let mbCount = 0;
 // let prbCount = 0;
 let foundCaptcha = false;
+let solveCaptchaAgain = true;
+let captchaUrl = null;
 
 const findPokemon = () => {
     return new Promise((resolve, reject) => {
@@ -51,9 +53,9 @@ const stopCaptchaCount = () => {
 };
 
 const shouldBuyPokeball = () => {
-    if (pbCount >= 10) {
+    if (pbCount >= 20) {
         setTimeout(() => {
-            buyPokeball(1, 10);
+            buyPokeball(1, 20);
             pbCount = 0;
         }, 4000);
     }
@@ -99,8 +101,13 @@ const getPokeballType = (text) => {
 const sendCaptchaRes = (solvedCaptcha) => {
     return new Promise((resolve, _reject) => {
         axios.post(apiPost, { content: solvedCaptcha }, { headers }).then(res => {
-            shouldBuyPokeball();
             resolve(res);
+            solveCaptchaAgain = true;
+            setTimeout(() => {
+                if (solveCaptchaAgain) {
+                    solveCaptcha(captchaUrl);
+                }
+            }, 5000);
         });
     });
 }
@@ -109,9 +116,9 @@ const solveCaptcha = (uri) => {
     imageToBase64(uri) // Image URL
     .then(
         (response) => {
-            axios.post('http://2captcha.com/in.php', { body: response, method: 'base64', key: '8bce43db75193c38a012feb8835510bd', json: 1 }).then((resPost) => {
+            axios.post('http://2captcha.com/in.php', { body: response, method: 'base64', key: `${twoCaptchaKey}`, json: 1, numeric: 1 }).then((resPost) => {
                 setTimeout(() => {
-                    axios.get(`http://2captcha.com/res.php?key=8bce43db75193c38a012feb8835510bd&action=get&json=1&id=${resPost.data.request}`).then((resGet) => {
+                    axios.get(`http://2captcha.com/res.php?key=${twoCaptchaKey}&action=get&json=1&id=${resPost.data.request}`).then((resGet) => {
                         sendCaptchaRes(resGet.data.request);
                     }).catch((errGet) => {
                         console.log('ERR GET', errGet);
@@ -139,15 +146,19 @@ const runReadBot = () => {
     client.on('message', msg => {
         if (msg.channel.id === chatId && msg.author.id === pokeBotId) {
             if (msg.content.search('captcha') !== -1 && foundCaptcha) {
+                solveCaptchaAgain = false;
                 msg.attachments.map((item) => {
+                    captchaUrl = item.url;
                     solveCaptcha(item.url);
                     msg.channel.send("Errou indiano maldito, tente dnv");
                 })
             }
             if (msg.content.search('captcha') !== -1 && !foundCaptcha) {
                 foundCaptcha = true;
+                solveCaptchaAgain = false;
                 clearInterval(intervalRef);
                 msg.attachments.map((item) => {
+                    captchaUrl = item.url;
                     solveCaptcha(item.url);
                 })
                 msg.channel.send("Resolvam indianos!!!");
@@ -155,13 +166,16 @@ const runReadBot = () => {
                 // stopCaptchaCount();
             }
             if (msg.content.search('catch') !== -1 && !foundCaptcha) {
-                const pokeballType = getPokeballType(msg.embeds[0].footer.text);
-                throwPokeball(pokeballType);
+                if (msg.embeds.length && msg.embeds[0].footer) {
+                    const pokeballType = getPokeballType(msg.embeds[0].footer.text);
+                    throwPokeball(pokeballType);
+                }
                 // setTimeout(() => {
                 // }, 500);
             }
             if (msg.content.search('continue hunting!') !== -1 && foundCaptcha) {
                 foundCaptcha = false;
+                solveCaptchaAgain = false;
                 msg.channel.send("Boaaaaa indiano");
                 runWriteBot();
             }
