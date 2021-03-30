@@ -2,14 +2,14 @@ import axios from 'axios';
 import imageToBase64 from 'image-to-base64';
 import Discord from 'discord.js';
 import alert from 'alert';
-import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, twoCaptchaKey, typingApi } from './config.js';
+import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, twoCaptchaKey, typingApi } from './config.mjs';
 const client = new Discord.Client();
 
 let intervalRef = null;
 let pbCount = 0;
-// let gbCount = 0;
+let gbCount = 0;
 let ubCount = 0;
-// let mbCount = 0;
+let mbCount = 0;
 // let prbCount = 0;
 let foundCaptcha = false;
 let solveCaptchaAgain = true;
@@ -53,15 +53,25 @@ const stopCaptchaCount = () => {
 };
 
 const shouldBuyPokeball = () => {
-    if (pbCount >= 20) {
+    if (pbCount >= 10) {
         setTimeout(() => {
-            buyPokeball(1, 20);
+            // openItems();
+
+            buyPokeball(1, 10);
             pbCount = 0;
+        }, 4000);
+    }
+    if (gbCount >= 10) {
+        setTimeout(() => {
+            buyPokeball(2, 10);
+            // openItems();
+            gbCount = 0;
         }, 4000);
     }
     if (ubCount >= 3) {
         setTimeout(() => {
-            buyPokeball(3, 3);
+            // buyPokeball(3, 3);
+            openItems();
             ubCount = 0;
         }, 4000);
     }
@@ -77,19 +87,34 @@ const buyPokeball = (pokeballId, quantity) => {
     });
 };
 
+const openItems = () => {
+    return new Promise((resolve, _reject) => {
+        axios.post(apiPost, { content: `;items` }, { headers }).then(res => {
+            resolve(res);
+        }).catch((err) => {
+            console.log('ERR?', err);
+        })
+    });
+};
+
 const getPokeballType = (text) => {
     if (text.search('Common') !== -1 || text.search('Uncommon') !== -1) {
         pbCount ++;
         return 'pb';
     } else if (text.search('Rare') !== -1 && text.search('Super') === -1) {
-        pbCount ++;
-        return 'pb';
+        gbCount ++;
+        return 'gb';
     } else if (text.search('Super Rare') !== -1) {
         ubCount ++;
         return 'ub';
     } else if (text.search('Legendary') !== -1 || text.search('Shiny') !== -1) {
-        ubCount ++;
-        return 'ub';
+        if (mbCount < 2) {
+          mbCount ++;
+          return 'mb'
+        } else {
+          ubCount ++;
+          return 'ub';
+        }
     }
 }
 
@@ -107,7 +132,12 @@ const sendCaptchaRes = (solvedCaptcha) => {
     });
 }
 
+// const getCaptchaAgain = (url) => {
+
+// }
+
 const solveCaptcha = (uri) => {
+    alert('Resolve captcha!');
     imageToBase64(uri) // Image URL
     .then(
         (response) => {
