@@ -53,7 +53,7 @@ const stopCaptchaCount = () => {
 };
 
 const shouldBuyPokeball = () => {
-    if (pbCount >= 150) {
+    if (pbCount >= 10) {
         setTimeout(() => {
             buyPokeball(1, 10);
             pbCount = 0;
