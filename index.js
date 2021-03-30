@@ -14,6 +14,7 @@ let mbCount = 0;
 let foundCaptcha = false;
 let solveCaptchaAgain = true;
 let captchaUrl = null;
+let captchaCount = 0;
 
 const findPokemon = () => {
     return new Promise((resolve, reject) => {
@@ -70,8 +71,8 @@ const shouldBuyPokeball = () => {
     }
     if (ubCount >= 3) {
         setTimeout(() => {
-            // buyPokeball(3, 3);
-            openItems();
+            buyPokeball(3, 3);
+            // openItems();
             ubCount = 0;
         }, 4000);
     }
@@ -107,7 +108,7 @@ const getPokeballType = (text) => {
     } else if (text.search('Super Rare') !== -1) {
         ubCount ++;
         return 'ub';
-    } else if (text.search('Legendary') !== -1 || text.search('Shiny') !== -1) {
+    } else if (text.search('Legendary') !== -1 || text.search('Shiny') !== -1 || text.search('Golden') !== -1) {
         if (mbCount < 2) {
           mbCount ++;
           return 'mb'
@@ -127,7 +128,7 @@ const sendCaptchaRes = (solvedCaptcha) => {
                 if (solveCaptchaAgain) {
                     solveCaptcha(captchaUrl);
                 }
-            }, 5000);
+            }, 8000);
         });
     });
 }
@@ -137,7 +138,11 @@ const sendCaptchaRes = (solvedCaptcha) => {
 // }
 
 const solveCaptcha = (uri) => {
-    alert('Resolve captcha!');
+    captchaCount ++;
+    if (captchaCount === 3) {
+        captchaCount = 0;
+        alert('Resolve captcha!');
+    }
     imageToBase64(uri) // Image URL
     .then(
         (response) => {
@@ -164,7 +169,7 @@ const solveCaptcha = (uri) => {
 const runWriteBot = () => {
     intervalRef = setInterval(() => {
         findPokemon();
-    }, 12500);
+    }, 15000);
 };
 
 const runReadBot = () => {
@@ -193,10 +198,10 @@ const runReadBot = () => {
             if (msg.content.search('catch') !== -1 && !foundCaptcha) {
                 if (msg.embeds.length && msg.embeds[0].footer) {
                     const pokeballType = getPokeballType(msg.embeds[0].footer.text);
-                    throwPokeball(pokeballType);
+                    setTimeout(() => {
+                        throwPokeball(pokeballType);
+                    }, 2000);
                 }
-                // setTimeout(() => {
-                // }, 500);
             }
             if (msg.content.search('continue hunting!') !== -1 && foundCaptcha) {
                 foundCaptcha = false;
