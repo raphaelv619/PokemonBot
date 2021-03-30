@@ -1,10 +1,4 @@
-import { account } from "./Utils/account";
-const getAccount = account.getAccount || undefined;
-const SELECTED_USER = getAccount({ accountName: 'patolonha' }) || undefined;
-const _chatId = SELECTED_USER.chatId || '824008153023643688';
-const _authorization = SELECTED_USER.authorization || '824008153023643688';
-
-const chatId = _chatId;
+const chatId = '824008083487457342';
 const apiPost = `https://discord.com/api/v8/channels/${chatId}/messages`;
 const typingApi = `https://discord.com/api/v8/channels/${chatId}/typing`;
 const headers = {
@@ -12,7 +6,7 @@ const headers = {
     'accept-encoding': 'gzip, deflate, br',
     'accept-language': 'pt-BR',
     'content-type': 'application/json',
-    authorization: _authorization,
+    authorization: 'NzQ0OTc2OTQ5MTU1MzMyMTA2.YGD57Q.ZpRb-ZC_iqZOerR2OjeWoGcf0v8',
     'cookie': '__cfduid=de0e885576a7a30ae7ff46bf34b4d55181616437070; locale=pt-BR',
     'origin': 'https://discord.com',
     'referer': `https://discord.com/channels/689624343138795532/${chatId}`,

@@ -55,6 +55,8 @@ const stopCaptchaCount = () => {
 const shouldBuyPokeball = () => {
     if (pbCount >= 10) {
         setTimeout(() => {
+            // openItems();
+
             buyPokeball(1, 10);
             pbCount = 0;
         }, 4000);
@@ -62,12 +64,14 @@ const shouldBuyPokeball = () => {
     if (gbCount >= 10) {
         setTimeout(() => {
             buyPokeball(2, 10);
+            // openItems();
             gbCount = 0;
         }, 4000);
     }
     if (ubCount >= 3) {
         setTimeout(() => {
-            buyPokeball(3, 3);
+            // buyPokeball(3, 3);
+            openItems();
             ubCount = 0;
         }, 4000);
     }
@@ -76,6 +80,16 @@ const shouldBuyPokeball = () => {
 const buyPokeball = (pokeballId, quantity) => {
     return new Promise((resolve, _reject) => {
         axios.post(apiPost, { content: `;shop buy ${pokeballId} ${quantity}` }, { headers }).then(res => {
+            resolve(res);
+        }).catch((err) => {
+            console.log('ERR?', err);
+        })
+    });
+};
+
+const openItems = () => {
+    return new Promise((resolve, _reject) => {
+        axios.post(apiPost, { content: `;items` }, { headers }).then(res => {
             resolve(res);
         }).catch((err) => {
             console.log('ERR?', err);
@@ -94,7 +108,7 @@ const getPokeballType = (text) => {
         ubCount ++;
         return 'ub';
     } else if (text.search('Legendary') !== -1 || text.search('Shiny') !== -1) {
-        if (mbCount < 3) {
+        if (mbCount < 2) {
           mbCount ++;
           return 'mb'
         } else {
@@ -117,6 +131,10 @@ const sendCaptchaRes = (solvedCaptcha) => {
         });
     });
 }
+
+// const getCaptchaAgain = (url) => {
+
+// }
 
 const solveCaptcha = (uri) => {
     alert('Resolve captcha!');
