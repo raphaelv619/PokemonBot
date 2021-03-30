@@ -2,7 +2,7 @@ import axios from 'axios';
 import imageToBase64 from 'image-to-base64';
 import Discord from 'discord.js';
 import alert from 'alert';
-import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, twoCaptchaKey, typingApi } from './config.js';
+import { apiPost, chatId, pokeBotId, ourDiscordBotToken, headers, twoCaptchaKey, typingApi } from './config.mjs';
 const client = new Discord.Client();
 
 let intervalRef = null;
@@ -204,6 +204,7 @@ const runReadBot = () => {
                 }
             }
             if (msg.content.search('continue hunting!') !== -1 && foundCaptcha) {
+                captchaCount = 0;
                 foundCaptcha = false;
                 solveCaptchaAgain = false;
                 msg.channel.send("Boaaaaa indiano");

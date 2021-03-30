@@ -1,4 +1,4 @@
-const chatId = '824008083487457342';
+const chatId = '824008386202697818';
 const apiPost = `https://discord.com/api/v8/channels/${chatId}/messages`;
 const typingApi = `https://discord.com/api/v8/channels/${chatId}/typing`;
 const headers = {
@@ -6,7 +6,7 @@ const headers = {
     'accept-encoding': 'gzip, deflate, br',
     'accept-language': 'pt-BR',
     'content-type': 'application/json',
-    authorization: 'NzQ0OTc2OTQ5MTU1MzMyMTA2.YGD57Q.ZpRb-ZC_iqZOerR2OjeWoGcf0v8',
+    authorization: 'MzAwNDE5MzExMDg2OTkzNDEx.YFiUKQ.YwE46-UUBExN-_80qdTULofp104',
     'cookie': '__cfduid=de0e885576a7a30ae7ff46bf34b4d55181616437070; locale=pt-BR',
     'origin': 'https://discord.com',
     'referer': `https://discord.com/channels/689624343138795532/${chatId}`,
