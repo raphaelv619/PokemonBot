@@ -15,11 +15,15 @@ let foundCaptcha = false;
 let solveCaptchaAgain = true;
 let captchaUrl = null;
 let captchaCount = 0;
+let throwsCount = 0;
+let pCount = 0;
 
 const findPokemon = () => {
     return new Promise((resolve, reject) => {
         tellDiscYreTyping().then(() => {
             axios.post(apiPost, { content: ";p" }, { headers }).then((res) => {
+                pCount++;
+                throwsCount++;
                 resolve(res);
             })
         })
@@ -54,33 +58,55 @@ const stopCaptchaCount = () => {
 };
 
 const shouldBuyPokeball = () => {
-    if (pbCount >= 10) {
+    if (pbCount >= 20) {
         setTimeout(() => {
             // openItems();
-
-            buyPokeball(1, 10);
+            buyPokeball(1, 20);
+            // resetBot();
             pbCount = 0;
-        }, 4000);
+        }, randomIntFromInterval(3000, 4000));
     }
     if (gbCount >= 10) {
         setTimeout(() => {
             buyPokeball(2, 10);
             // openItems();
+            // resetBot();
             gbCount = 0;
-        }, 4000);
+        }, randomIntFromInterval(3000, 4000));
     }
     if (ubCount >= 3) {
         setTimeout(() => {
             buyPokeball(3, 3);
             // openItems();
+            // resetBot();
             ubCount = 0;
-        }, 4000);
+        }, randomIntFromInterval(3000, 4000));
     }
+}
+
+const resetBot = () => {
+    clearInterval(intervalRef);
+    setTimeout(() => {
+        openPokedex();
+        setTimeout(() => {
+            runWriteBot();
+        }, randomIntFromInterval(15000, 20000))
+    }, randomIntFromInterval(6000, 8000))
 }
 
 const buyPokeball = (pokeballId, quantity) => {
     return new Promise((resolve, _reject) => {
         axios.post(apiPost, { content: `;shop buy ${pokeballId} ${quantity}` }, { headers }).then(res => {
+            resolve(res);
+        }).catch((err) => {
+            console.log('ERR?', err);
+        })
+    });
+};
+
+const openPokedex = () => {
+    return new Promise((resolve, _reject) => {
+        axios.post(apiPost, { content: `;pokedex` }, { headers }).then(res => {
             resolve(res);
         }).catch((err) => {
             console.log('ERR?', err);
@@ -109,21 +135,20 @@ const getPokeballType = (text) => {
         ubCount ++;
         return 'ub';
     } else if (text.search('Legendary') !== -1 || text.search('Shiny') !== -1 || text.search('Golden') !== -1) {
-        if (mbCount < 2) {
+        if (mbCount < 1) {
           mbCount ++;
-          return 'mb'
+          return 'prb'
         } else {
-          ubCount ++;
-          return 'ub';
+          return 'prb';
         }
     }
 }
 
 const sendCaptchaRes = (solvedCaptcha) => {
+    solveCaptchaAgain = true;
     return new Promise((resolve, _reject) => {
         axios.post(apiPost, { content: solvedCaptcha }, { headers }).then(res => {
             resolve(res);
-            solveCaptchaAgain = true;
             setTimeout(() => {
                 if (solveCaptchaAgain) {
                     solveCaptcha(captchaUrl);
@@ -138,8 +163,9 @@ const sendCaptchaRes = (solvedCaptcha) => {
 // }
 
 const solveCaptcha = (uri) => {
+    console.log(';P COUNT', pCount, Date.now());
     captchaCount ++;
-    if (captchaCount === 3) {
+    if (captchaCount === 4) {
         captchaCount = 0;
         alert('Resolve captcha!');
     }
@@ -166,10 +192,19 @@ const solveCaptcha = (uri) => {
     )
 }
 
+const randomIntFromInterval = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 const runWriteBot = () => {
     intervalRef = setInterval(() => {
-        findPokemon();
-    }, 15000);
+        if (throwsCount >= 15) {
+            resetBot();
+            throwsCount = 0;
+        } else {
+            findPokemon();
+        }
+    }, randomIntFromInterval(12500, 15000));
 };
 
 const runReadBot = () => {
@@ -200,10 +235,11 @@ const runReadBot = () => {
                     const pokeballType = getPokeballType(msg.embeds[0].footer.text);
                     setTimeout(() => {
                         throwPokeball(pokeballType);
-                    }, 2000);
+                    }, randomIntFromInterval(1500, 2000));
                 }
             }
             if (msg.content.search('continue hunting!') !== -1 && foundCaptcha) {
+                captchaCount = 0;
                 foundCaptcha = false;
                 solveCaptchaAgain = false;
                 msg.channel.send("Boaaaaa indiano");
